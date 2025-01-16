@@ -13,3 +13,4 @@ runs/
 *.DS_Store
 notebooks/
 pretrained/
+logger/

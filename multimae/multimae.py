@@ -365,7 +365,7 @@ class MultiMAE(nn.Module):
             if domain not in fp32_output_adapters
         }
         # Force running selected output adapters in fp32 mode
-        with torch.cuda.amp.autocast(enabled=False):
+        with torch.amp.autocast(device_type="cuda", enabled=False):
             for domain in fp32_output_adapters:
                 if domain not in self.output_adapters:
                     continue

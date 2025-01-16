@@ -20,6 +20,7 @@ import warnings
 import torch
 import torch.nn as nn
 from einops import rearrange
+from multimae.modality_disentangle_adapters import ModalityDisentangleAdapter
 
 
 def pair(t):
@@ -225,10 +226,17 @@ class Block(nn.Module):
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.modality_disentangle_adapter = ModalityDisentangleAdapter(in_features=dim, hidden_features=None, out_features=dim, act_layer=act_layer, drop=drop)
 
     def forward(self, x):
-        x = x + self.drop_path(self.attn(self.norm1(x)))
-        x = x + self.drop_path(self.mlp(self.norm2(x)))
+        # freeze every thing except self.modality_disentangle_adapter
+        for param in self.parameters():
+            param.requires_grad = False
+        for param in self.modality_disentangle_adapter.parameters():
+            param.requires_grad = True
+
+        x = x + self.drop_path(self.attn(self.norm1(x)) + self.modality_disentangle_adapter(self.norm1(x)))
+        x = x + self.drop_path(self.mlp(self.norm2(x)) + self.modality_disentangle_adapter(self.norm2(x)))
         return x
 
 
