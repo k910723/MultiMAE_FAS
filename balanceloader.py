@@ -54,7 +54,7 @@ class FAS_Dataset(Dataset):
                  protocol=['C','S','W','train', 'train_grandtest', 'train_LOO_glasses',
                            'train_LOO_flexiblemask', 'train_LOO_rigidmask', 'train_LOO_prints',
                            'train_LOO_papermask', 'train_LOO_fakehead', 'train_LOO_replay'], 
-                 train = True , size = 224, cls = 'real'):
+                 train = True , size = 224, class_type = 'real'):
         
         # assert train_test_dev in ["Train", "Test", "Dev"]
         # assert ls in ["live", "spoof"]
@@ -66,24 +66,24 @@ class FAS_Dataset(Dataset):
         self.alld = []
         self.alli = []
         self.atktype = [] # type_id 0 = real, others = attack
-        self.cls = cls
+        self.class_type = class_type
         self.protocol = protocol
 
         for i in protocol:
 
-            if i in ('train', 'train_grandtest', 'train_LOO_glasses',
+            if i in ('train_grandtest', 'train_LOO_glasses',
                            'train_LOO_flexiblemask', 'train_LOO_rigidmask', 'train_LOO_prints',
                            'train_LOO_papermask', 'train_LOO_fakehead', 'train_LOO_replay'):
                 
                 print('train_get_data')
-                r = sorted(glob.glob((os.path.join(root, f"train/"+ self.cls +"/rgb/*.jpg"))))
-                d = sorted(glob.glob((os.path.join(root, f"train/"+ self.cls +"/depth/*.jpg"))))
-                i = sorted(glob.glob((os.path.join(root, f"train/"+ self.cls +"/ir/*.jpg"))))
+                r = sorted(glob.glob((os.path.join(root, f"train/"+ self.class_type +"/rgb/*.jpg"))))
+                d = sorted(glob.glob((os.path.join(root, f"train/"+ self.class_type +"/depth/*.jpg"))))
+                i = sorted(glob.glob((os.path.join(root, f"train/"+ self.class_type +"/ir/*.jpg"))))
                 
                 self.allr += r
                 self.alld += d
                 self.alli += i
-                print(len(self.allr), len(self.alld))
+                print(len(self.allr), len(self.alld), len(self.alli))
 
             if i == 'intraS':
                 # r = sorted(glob.glob(os.path.join(root, f"train/"+ self.cls +"/color/*.jpg")))
@@ -94,9 +94,9 @@ class FAS_Dataset(Dataset):
                 # self.alld += d
                 # self.alli += i
                 
-                self.allr = np.load(root + '/train/'+ self.cls +'/rgb.npy')
-                self.alld = np.load(root + '/train/'+ self.cls +'/depth.npy')
-                self.alli = np.load(root + '/train/'+ self.cls +'/ir.npy')
+                self.allr = np.load(root + '/train/'+ self.class_type +'/rgb.npy')
+                self.alld = np.load(root + '/train/'+ self.class_type +'/depth.npy')
+                self.alli = np.load(root + '/train/'+ self.class_type +'/ir.npy')
             
             if i == 'intraC':
                 # r = sorted(glob.glob(os.path.join(root, f"train/"+ self.cls +"/profile/*.jpg")))
@@ -106,34 +106,39 @@ class FAS_Dataset(Dataset):
                 # self.allr += r
                 # self.alld += d
                 # self.alli += i
-                self.allr = np.load(root + '/train/'+ self.cls +'/rgb.npy')
-                self.alld = np.load(root + '/train/'+ self.cls +'/depth.npy')
-                self.alli = np.load(root + '/train/'+ self.cls +'/ir.npy')
+                self.allr = np.load(root + '/train/'+ self.class_type +'/rgb.npy')
+                self.alld = np.load(root + '/train/'+ self.class_type +'/depth.npy')
+                self.alli = np.load(root + '/train/'+ self.class_type +'/ir.npy')
                 
             if i == 'train':
                 #/shared/flexible_multi_modality/
-                # r = sorted(glob.glob((os.path.join(root, f"train/"+ self.cls +"/rgb/*.jpg"))))
-                # d = sorted(glob.glob((os.path.join(root, f"train/"+ self.cls +"/depth/*.jpg"))))
-                # i = sorted(glob.glob((os.path.join(root, f"train/"+ self.cls +"/ir/*.jpg"))))
+                # jpg data might be corrupted
+                #r = sorted(glob.glob((os.path.join(root, f"train/"+ self.class_type +"/rgb/*.jpg"))))
+                #d = sorted(glob.glob((os.path.join(root, f"train/"+ self.class_type +"/depth/*.jpg"))))
+                #i = sorted(glob.glob((os.path.join(root, f"train/"+ self.class_type +"/ir/*.jpg"))))
                 
-                # self.allr += r
-                # self.alld += d
-                # self.alli += i
+                #self.allr += r
+                #self.alld += d
+                #self.alli += i
+
+                print('train_get_data')
                 
-                self.allr = np.load(root + '/train/'+ self.cls +'/rgb.npy')
-                self.alld = np.load(root + '/train/'+ self.cls +'/depth.npy')
-                self.alli = np.load(root + '/train/'+ self.cls +'/ir.npy')
+                self.allr = np.load(root + '/train/'+ self.class_type +'/rgb.npy')
+                self.alld = np.load(root + '/train/'+ self.class_type +'/depth.npy')
+                self.alli = np.load(root + '/train/'+ self.class_type +'/ir.npy')
+
+                print(len(self.allr), len(self.alld), len(self.alli))
                 
             if i == 'inter':
                 
-                self.allr = np.load(root + '/cross_testing/'+ self.cls +'/rgb.npy')
-                self.alld = np.load(root + '/cross_testing/'+ self.cls +'/depth.npy')
-                self.alli = np.load(root + '/cross_testing/'+ self.cls +'/ir.npy')
+                self.allr = np.load(root + '/cross_testing/'+ self.class_type +'/rgb.npy')
+                self.alld = np.load(root + '/cross_testing/'+ self.class_type +'/depth.npy')
+                self.alli = np.load(root + '/cross_testing/'+ self.class_type +'/ir.npy')
                 
             if i == 'C':
-                r = sorted(glob.glob(os.path.join(root, f"CeFA/"+ self.cls +"/profile/*.jpg")))
-                d = sorted(glob.glob(os.path.join(root, f"CeFA/"+ self.cls +"/depth/*.jpg")))
-                i = sorted(glob.glob(os.path.join(root, f"CeFA/"+ self.cls +"/ir/*.jpg")))
+                r = sorted(glob.glob(os.path.join(root, f"CeFA/"+ self.class_type +"/profile/*.jpg")))
+                d = sorted(glob.glob(os.path.join(root, f"CeFA/"+ self.class_type +"/depth/*.jpg")))
+                i = sorted(glob.glob(os.path.join(root, f"CeFA/"+ self.class_type +"/ir/*.jpg")))
                 
                 #<client id> <session id> <presenter id> <type id> <pai id>.jpg
                 
@@ -145,9 +150,9 @@ class FAS_Dataset(Dataset):
                 
                 # self.atktype += [int(0) for x in r]
             if i == 'S':
-                r = sorted(glob.glob(os.path.join(root, f"SURF/"+ self.cls +"/profile/*.jpg")))
-                d = sorted(glob.glob(os.path.join(root, f"SURF/"+ self.cls +"/depth/*.jpg")))
-                i = sorted(glob.glob(os.path.join(root, f"SURF/"+ self.cls +"/ir/*.jpg")))
+                r = sorted(glob.glob(os.path.join(root, f"SURF/"+ self.class_type +"/profile/*.jpg")))
+                d = sorted(glob.glob(os.path.join(root, f"SURF/"+ self.class_type +"/depth/*.jpg")))
+                i = sorted(glob.glob(os.path.join(root, f"SURF/"+ self.class_type +"/ir/*.jpg")))
                 
 
                 
@@ -161,9 +166,9 @@ class FAS_Dataset(Dataset):
                 
                 # self.atktype += [ int(0) for x in r]
             if i == 'W':
-                r = sorted(glob.glob(os.path.join(root, f"WMCA/"+ self.cls +"/profile/*.jpg")))
-                d = sorted(glob.glob(os.path.join(root, f"WMCA/"+ self.cls +"/depth/*.jpg")))
-                i = sorted(glob.glob(os.path.join(root, f"WMCA/"+ self.cls +"/ir/*.jpg")))
+                r = sorted(glob.glob(os.path.join(root, f"WMCA/"+ self.class_type +"/profile/*.jpg")))
+                d = sorted(glob.glob(os.path.join(root, f"WMCA/"+ self.class_type +"/depth/*.jpg")))
+                i = sorted(glob.glob(os.path.join(root, f"WMCA/"+ self.class_type +"/ir/*.jpg")))
 
                 #<client id> <session id> <presenter id> <type id> <pai id>.jpg
                 
@@ -176,7 +181,7 @@ class FAS_Dataset(Dataset):
                 # self.atktype += [int(x.split('/')[-1].split('.')[0].split('_')[3]) for x in r]
         
 
-        if self.cls == 'real':
+        if self.class_type == 'real':
             # self.total_labels = np.zeros(len(self.allr), dtype=np.int64)
             self.total_labels = np.ones(len(self.allr), dtype=np.int64)
         else:
@@ -287,13 +292,13 @@ class FAS_Dataset(Dataset):
         return len(self.total_rgb)
 
 
-def get_loader( root, protocol, batch_size=10, shuffle=True, train = True, size = 224, cls = 'real'):
+def get_loader( root, protocol, batch_size=10, shuffle=True, train = True, size = 224, class_type = 'real'):
     
     _dataset = FAS_Dataset(root=root,
                            protocol=protocol,
                            train = train,
                            size = size,
-                           cls = cls)
+                           class_type = class_type)
     
     return DataLoader(_dataset, batch_size=batch_size, shuffle=shuffle, pin_memory=True)
 

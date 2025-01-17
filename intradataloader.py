@@ -50,7 +50,7 @@ def getSubjects(configPath):
 
 class FAS_Dataset(Dataset):
     def __init__(self, root, 
-                protocol=['C','S','W','train', 'grandtest', 'LOO_glasses',
+                protocol=['C','S','W','train', 'test', 'grandtest', 'LOO_glasses',
                            'LOO_flexiblemask', 'LOO_rigidmask', 'LOO_prints',
                            'LOO_papermask', 'LOO_fakehead', 'LOO_replay'], 
                 train = True , size = 224):
@@ -72,26 +72,34 @@ class FAS_Dataset(Dataset):
 
         for i in protocol:
 
-            if i in ('train', 'grandtest', 'LOO_glasses',
+            if i in ('train', 'test', 'grandtest', 'LOO_glasses',
                            'LOO_flexiblemask', 'LOO_rigidmask', 'LOO_prints',
                            'LOO_papermask', 'LOO_fakehead', 'LOO_replay'):
                 print('get_test_data')
                 
-                liver = sorted(glob.glob(os.path.join(root, f"test/real/rgb/*.jpg")))
-                lived = sorted(glob.glob(os.path.join(root, f"test/real/depth/*.jpg")))
-                livei = sorted(glob.glob(os.path.join(root, f"test/real/ir/*.jpg")))
+                #liver = sorted(glob.glob(os.path.join(root, f"test/real/rgb/*.jpg")))
+                #lived = sorted(glob.glob(os.path.join(root, f"test/real/depth/*.jpg")))
+                #livei = sorted(glob.glob(os.path.join(root, f"test/real/ir/*.jpg")))
                 
-                spoofr = sorted(glob.glob(os.path.join(root, f"test/spoof/rgb/*.jpg")))
-                spoofd = sorted(glob.glob(os.path.join(root, f"test/spoof/depth/*.jpg")))
-                spoofi = sorted(glob.glob(os.path.join(root, f"test/spoof/ir/*.jpg")))
+                #spoofr = sorted(glob.glob(os.path.join(root, f"test/spoof/rgb/*.jpg")))
+                #spoofd = sorted(glob.glob(os.path.join(root, f"test/spoof/depth/*.jpg")))
+                #spoofi = sorted(glob.glob(os.path.join(root, f"test/spoof/ir/*.jpg")))
                 
-                self.all_liver += liver
-                self.all_lived += lived
-                self.all_livei += livei
+                #self.all_liver += liver
+                #self.all_lived += lived
+                #self.all_livei += livei
                 
-                self.all_spoofr += spoofr
-                self.all_spoofd += spoofd
-                self.all_spoofi += spoofi
+                #self.all_spoofr += spoofr
+                #self.all_spoofd += spoofd
+                #self.all_spoofi += spoofi
+
+                self.all_liver = np.load(root + '/test/real/rgb.npy')
+                self.all_lived = np.load(root + '/test/real/depth.npy')
+                self.all_livei = np.load(root + '/test/real/ir.npy')
+
+                self.all_spoofr = np.load(root + '/test/spoof/rgb.npy')
+                self.all_spoofd = np.load(root + '/test/spoof/depth.npy')
+                self.all_spoofi = np.load(root + '/test/spoof/ir.npy')
                 
             if i == 'inter':
                 # liver = sorted(glob.glob(os.path.join(root, f"cross_testing/real/rgb/*.jpg")))

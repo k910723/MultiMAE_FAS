@@ -338,13 +338,16 @@ class MultiMAE(nn.Module):
             ids_keep = ids_shuffle[:, :(mask_all == 0).sum()]
 
         input_tokens = torch.cat([task_tokens for task_tokens in input_task_tokens.values()], dim=1)
+        #print('1 : ', input_tokens.shape) # [32, 588, 768]
 
         # Apply mask
-        input_tokens = torch.gather(input_tokens, dim=1, index=ids_keep.unsqueeze(-1).repeat(1, 1, input_tokens.shape[2]))
+        #input_tokens = torch.gather(input_tokens, dim=1, index=ids_keep.unsqueeze(-1).repeat(1, 1, input_tokens.shape[2]))
+        #print('2 : ', input_tokens.shape) # [32, 128, 768]
 
         # Add global tokens to input tokens
         global_tokens = repeat(self.global_tokens, '() n d -> b n d', b=B)
         input_tokens = torch.cat([input_tokens, global_tokens], dim=1)
+        #print('3 : ', input_tokens.shape) # [32, 129, 768]
 
         ## Transformer forward pass
         encoder_tokens = self.encoder(input_tokens)

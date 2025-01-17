@@ -45,7 +45,7 @@ args = parser.parse_args()
 dataset1 = args.train_dataset
 device_id = 'cuda:0'
 results_filename = dataset1.replace('/', '_') + '_MultiMAE' #_final_version_
-results_path = '/shared/shared/yitinglin/PR/' + results_filename
+results_path = '/home/kevin/MMA-FAS/' + results_filename
 
 os.system("rm -r "+results_path)
 
@@ -53,7 +53,7 @@ lr_rate1 = random.choice([7e-5,8e-5])#,0.9,
 lr1 = lr_rate1
 
 # batch_size = random.choice([10])
-batch_size = 32
+batch_size = 16
 model_save_step = 10
 model_save_epoch = 1
 
@@ -69,7 +69,9 @@ logging.info(f"Batch Size:      {batch_size}")
 logging.info(f"Train on {dataset1}")
 
 if dataset1 == 'C' or dataset1 == 'W' or dataset1 == 'S':
-    root = '/shared/shared/domain-generalization-multi'
+    root = '/var/mplab_share_data/domain-generalization-multi/'
+if dataset1 == 'train':
+    root = '/var/mplab_share_data/flexible_multi_modality/'
     
 # if dataset 1 is intraS
 if dataset1 == 'intraS':
@@ -119,8 +121,8 @@ criterion_mse = nn.MSELoss().to(device_id)
 contrastiveloss = losses.NTXentLoss(temperature=0.07)
 optimizerALL        = optim.AdamW(multimae.parameters(), lr=5e-5, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-3)
 
-live_loader = get_loader(root = root, protocol=[dataset1], batch_size=int(batch_size*0.5), shuffle=True, size = 224, cls = 'real')
-spoof_loader = get_loader(root = root, protocol=[dataset1], batch_size=int(batch_size*0.5), shuffle=True, size = 224, cls = 'spoof')
+live_loader = get_loader(root = root, protocol=[dataset1], batch_size=int(batch_size*0.5), shuffle=True, size = 224, class_type = 'real')
+spoof_loader = get_loader(root = root, protocol=[dataset1], batch_size=int(batch_size*0.5), shuffle=True, size = 224, class_type = 'spoof')
 
 # iternum = len(live_loader)
 iternum = max(len(live_loader), len(spoof_loader))

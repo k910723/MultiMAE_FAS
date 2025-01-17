@@ -87,13 +87,15 @@ dataset1 = args.train_dataset
 testing_datasets = [string]
 
 results_filename = dataset1.replace('/', '_') + '_MultiMAE' #_final_version_
-results_path = '/shared/shared/yitinglin/PR/' + results_filename
+results_path = '/home/kevin/MMA-FAS/' + results_filename
 
 if dataset1 == 'C' or dataset1 == 'W' or dataset1 == 'S':
-    root = '/shared/shared/domain-generalization-multi/'
+    root = '/var/mplab_share_data/domain-generalization-multi/'
 
 if testing_datasets[0] == 'intraS':
     root = '/shared/shared/SURF_intra2/'
+if testing_datasets[0] == 'test':
+    root = '/var/mplab_share_data/flexible_multi_modality/'
 
 logger_filename = 'MultiMAE_' + dataset1 + '_to_' + string + '_' + missing
 logging.Formatter.converter = lambda *args: datetime.now(tz=timezone('Asia/Taipei')).timetuple()
