@@ -189,7 +189,7 @@ with torch.no_grad():
             input_dict['depth'] = depth_img
             input_dict['ir'] = ir_img
 
-            pred = multimae(input_dict)
+            pred = multimae(input_dict, mask_inputs=False)
             pred = pred[0]['cls']
              
             score = F.softmax(pred, dim=1).cpu().data.numpy()[:, 1]  # multi class
