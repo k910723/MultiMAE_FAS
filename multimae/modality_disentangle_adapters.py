@@ -54,7 +54,7 @@ class ModalityDisentangleAdapter(nn.Module):
         center_w = w // 2
         
         # Create meshgrid
-        y, x = torch.meshgrid(torch.arange(h), torch.arange(w))
+        y, x = torch.meshgrid(torch.arange(h), torch.arange(w), indexing='ij')
         y = y.float().to(next(self.parameters()).device)
         x = x.float().to(next(self.parameters()).device)
         

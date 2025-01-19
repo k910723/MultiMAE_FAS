@@ -14,10 +14,13 @@ import torchvision.transforms.functional as TF
 def get_frame(path):
     
     # if path is .npy file then
-    frame =  Image.open(path)
+    # frame =  Image.open(path)
     # frame = Image.fromarray(path)
     # face_frame = transform_face(frame)
-    
+    if isinstance(path, np.ndarray):
+        frame = Image.fromarray(path)
+    else:
+        frame = Image.open(path)
     return frame
 
 
@@ -100,6 +103,9 @@ class FAS_Dataset(Dataset):
                 self.all_spoofr = np.load(root + '/test/spoof/rgb.npy')
                 self.all_spoofd = np.load(root + '/test/spoof/depth.npy')
                 self.all_spoofi = np.load(root + '/test/spoof/ir.npy')
+
+                print(len(self.all_liver), len(self.all_lived), len(self.all_livei))
+                print(len(self.all_spoofr), len(self.all_spoofd), len(self.all_spoofi))
                 
             if i == 'inter':
                 # liver = sorted(glob.glob(os.path.join(root, f"cross_testing/real/rgb/*.jpg")))

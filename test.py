@@ -82,7 +82,7 @@ missing = args.missing # "RRR"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 device_id = 'cuda:0'
-batch_size = 500
+batch_size = 100
 dataset1 = args.train_dataset
 testing_datasets = [string]
 

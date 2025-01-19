@@ -270,6 +270,7 @@ class MultiMAE(nn.Module):
 
     def forward(self, 
                 x: Union[Dict[str, torch.Tensor], torch.Tensor], 
+                masking: torch.Tensor = None,
                 mask_inputs: bool = True,
                 task_masks: Dict[str, torch.Tensor] = None,
                 num_encoded_tokens: int = 128,
@@ -281,6 +282,7 @@ class MultiMAE(nn.Module):
         If specified, will randomly drop input tokens.
 
         :param x: Input tensor or dictionary of tensors
+        :param masking: Tensor of shape [B] indicating which modality to mask for each sample
         :param mask_inputs: Set to True to enable random masking of input patches
         :param task_masks: Optional dictionary of task->mask pairs.
         :param num_encoded_tokens: Number of tokens to randomly select for encoder.
@@ -316,6 +318,7 @@ class MultiMAE(nn.Module):
         }
 
         input_info = self.generate_input_info(input_task_tokens=input_task_tokens, image_size=(H, W))
+        #print(input_info)
 
         # Select random subset of tokens from the chosen input tasks and concatenate them
         if mask_inputs:
@@ -338,16 +341,24 @@ class MultiMAE(nn.Module):
             ids_keep = ids_shuffle[:, :(mask_all == 0).sum()]
 
         input_tokens = torch.cat([task_tokens for task_tokens in input_task_tokens.values()], dim=1)
-        #print('1 : ', input_tokens.shape) # [32, 588, 768]
+        #print('1 : ', input_tokens.shape) # [B, 588, 768]
+
+        # Apply batch-level masking or sample-level masking according to the masking tensor
+        modality_tokens_lengths = input_tokens.shape[1] / len(input_task_tokens) # 588 / 3 = 196
+        if masking is not None:
+            for i in range(B):
+                start_idx = int(masking[i] * modality_tokens_lengths)
+                end_idx = start_idx + int(modality_tokens_lengths)
+                input_tokens[i, start_idx:end_idx, :] = 0
 
         # Apply mask
         #input_tokens = torch.gather(input_tokens, dim=1, index=ids_keep.unsqueeze(-1).repeat(1, 1, input_tokens.shape[2]))
-        #print('2 : ', input_tokens.shape) # [32, 128, 768]
+        #print('2 : ', input_tokens.shape) # [B, 128, 768]
 
         # Add global tokens to input tokens
         global_tokens = repeat(self.global_tokens, '() n d -> b n d', b=B)
         input_tokens = torch.cat([input_tokens, global_tokens], dim=1)
-        #print('3 : ', input_tokens.shape) # [32, 129, 768]
+        #print('3 : ', input_tokens.shape) # [B, 129, 768]
 
         ## Transformer forward pass
         encoder_tokens = self.encoder(input_tokens)
@@ -379,7 +390,7 @@ class MultiMAE(nn.Module):
                     ids_restore=ids_restore,
                 )
         
-        return preds, task_masks
+        return preds, encoder_tokens
 
 
 @register_model
